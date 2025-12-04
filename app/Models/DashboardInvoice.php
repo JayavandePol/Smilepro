@@ -10,15 +10,21 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Read model for invoices overview.
+ * Read model for invoices overview (requirements 4.2 & 4.3).
  */
 class DashboardInvoice extends Model
 {
     protected $table = 'invoices';
 
+    /**
+     * Haal factuurrecords op via stored procedure (requirements 4.2 & 4.3).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     public static function records(): Collection
     {
         try {
+            // Requirement 4.3: stored procedure GetInvoicesOverview aggregates invoice joins.
             $rows = DB::select('CALL GetInvoicesOverview()');
             return static::mapRows($rows);
         } catch (Throwable $exception) {
@@ -30,6 +36,11 @@ class DashboardInvoice extends Model
         }
     }
 
+    /**
+     * Fallback query die joins gebruikt wanneer de procedure faalt.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function fallback(): Collection
     {
         $rows = DB::table('invoices')
@@ -46,6 +57,12 @@ class DashboardInvoice extends Model
         return static::mapRows($rows);
     }
 
+    /**
+     * Vertaal queryresultaten naar read-model instanties zodat de view duidelijk blijft.
+     *
+     * @param iterable<object> $rows
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function mapRows(iterable $rows): Collection
     {
         return collect($rows)->map(function ($row) {

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Read model dedicated to the dashboard users index.
+ * Read model dedicated to the dashboard users index (requirements 4.2 & 4.3).
  */
 class DashboardUser extends Model
 {
@@ -20,12 +20,13 @@ class DashboardUser extends Model
     protected $table = 'users';
 
     /**
-     * Fetch users and their roles via stored procedure with joins.
+     * Fetch users and their roles via stored procedure with joins (requirements 4.2 & 4.3).
      */
     public static function withRoles(?string $roleFilter = null): Collection
     {
         // Requirement 4.3: prefer stored procedure for read operations.
         try {
+            // Requirement 4.3: stored procedure GetUsersWithRoles hydrates role info.
             $rows = DB::select('CALL GetUsersWithRoles()');
             return static::filterByRole(static::mapRows($rows), $roleFilter);
         } catch (Throwable $exception) {
@@ -38,7 +39,7 @@ class DashboardUser extends Model
     }
 
     /**
-     * Fallback query that reproduces the stored procedure behaviour using joins.
+     * Fallback query that reproduces the stored procedure behaviour using joins (requirement 4.2).
      */
     protected static function fallbackWithRoles(?string $roleFilter = null): Collection
     {

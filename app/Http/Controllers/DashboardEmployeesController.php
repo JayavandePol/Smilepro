@@ -34,13 +34,16 @@ class DashboardEmployeesController extends Controller
             $users = DashboardUser::withRoles($activeRole)
                 ->filter(fn ($managedUser) => collect($managedUser->role_names ?? [])->intersect($employeeRoles)->isNotEmpty());
 
+            // Requirement 1.2: report happy scenario.
             session()->flash('success', 'Medewerkers succesvol geladen.');
+            // Requirement 4.7: structured logging for audits.
             Log::info('Dashboard employees loaded', [
                 'user_id' => $user?->id,
                 'total' => $users->count(),
                 'role_filter' => $activeRole,
             ]);
 
+            // Requirement 2.1: return responsive employees grid/table.
             return view('dashboard.employees.view', [
                 'user' => $user,
                 'users' => $users,

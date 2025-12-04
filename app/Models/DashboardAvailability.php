@@ -16,9 +16,15 @@ class DashboardAvailability extends Model
 {
     protected $table = 'availabilities';
 
+    /**
+     * Haal alle beschikbaarheid op via stored procedure (requirements 4.2 & 4.3).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     public static function records(): Collection
     {
         try {
+            // Requirement 4.3: stored procedure entry point for availability reads.
             $rows = DB::select('CALL GetAvailabilityOverview()');
             return static::mapRows($rows);
         } catch (Throwable $exception) {
@@ -30,6 +36,11 @@ class DashboardAvailability extends Model
         }
     }
 
+    /**
+     * Fallback query met joins wanneer de procedure faalt.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function fallback(): Collection
     {
         $rows = DB::table('availabilities')
@@ -46,6 +57,12 @@ class DashboardAvailability extends Model
         return static::mapRows($rows);
     }
 
+    /**
+     * Zet rauwe database-rijen om naar read-model instanties.
+     *
+     * @param iterable<object> $rows
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function mapRows(iterable $rows): Collection
     {
         return collect($rows)->map(function ($row) {

@@ -13,20 +13,27 @@ class DashboardInvoicesController extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * Toon factuuroverzicht met filter en totalen (requirements 1.x, 2.1, 4.1).
+     */
     public function index(): View
     {
         $user = Auth::user();
         abort_if(!$user, 403);
 
+        // Requirements 1.1 & 4.4: read/aggregate within try/catch to provide feedback.
         try {
             $invoices = DashboardInvoice::records();
             $activeStatus = request('status');
             $filteredInvoices = $invoices->when($activeStatus, function ($collection) use ($activeStatus) {
                 return $collection->filter(fn ($invoice) => $invoice->status === $activeStatus)->values();
             }, fn ($collection) => $collection);
+            // Requirement 1.2: success flash for the end-user.
             session()->flash('success', 'Facturen succesvol geladen.');
+            // Requirement 4.7: log context for auditing.
             Log::info('Invoices overview loaded', ['user_id' => $user?->id, 'total' => $filteredInvoices->count()]);
 
+            // Requirement 2.1: serve Tailwind view with responsive cards/table.
             return view('dashboard.invoices.view', [
                 'user' => $user,
                 'invoices' => $filteredInvoices,
@@ -43,6 +50,7 @@ class DashboardInvoicesController extends Controller
                 'message' => $exception->getMessage(),
             ]);
 
+            // Requirement 1.4: unhappy scenario feedback with actionable message.
             session()->flash('error', 'Kon het factuuroverzicht niet laden.');
 
             return view('dashboard.invoices.view', [

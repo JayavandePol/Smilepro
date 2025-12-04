@@ -21,6 +21,7 @@ class DashboardAppointmentsController extends Controller
         $user = Auth::user();
         abort_if(!$user, 403);
 
+        // Requirements 1.1 & 4.4: guard read in try/catch for clear user feedback.
         try {
             $appointments = DashboardAppointment::records();
             $counts = DashboardAppointment::counts();
@@ -28,12 +29,15 @@ class DashboardAppointmentsController extends Controller
             $filteredAppointments = $appointments->when($activeStatus, function ($collection) use ($activeStatus) {
                 return $collection->filter(fn ($appointment) => $appointment->status === $activeStatus)->values();
             }, fn ($collection) => $collection);
+            // Requirement 1.2: success toast for the happy scenario.
             session()->flash('success', 'Afspraken succesvol geladen.');
+            // Requirement 4.7: log metrics + filters for auditing.
             Log::info('Appointments overview loaded', [
                 'user_id' => $user?->id,
                 'total' => $filteredAppointments->count(),
             ]);
 
+            // Requirement 2.1: respond with the responsive appointments dashboard view.
             return view('dashboard.appointments.view', [
                 'user' => $user,
                 'appointments' => $filteredAppointments,
@@ -46,6 +50,7 @@ class DashboardAppointmentsController extends Controller
                 'message' => $exception->getMessage(),
             ]);
 
+            // Requirement 1.4: clearly communicate the unhappy scenario.
             session()->flash('error', 'Kon de afspraken niet ophalen.');
 
             return view('dashboard.appointments.view', [

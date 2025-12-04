@@ -10,15 +10,21 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Read model for patient messages overview.
+ * Read model for patient messages overview (requirements 4.2 & 4.3).
  */
 class DashboardMessage extends Model
 {
     protected $table = 'messages';
 
+    /**
+     * Haal berichten op via stored procedure (requirements 4.2 & 4.3).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     public static function records(): Collection
     {
         try {
+            // Requirement 4.3: stored procedure GetMessagesOverview retrieves inbox data.
             $rows = DB::select('CALL GetMessagesOverview()');
             return static::mapRows($rows);
         } catch (Throwable $exception) {
@@ -30,6 +36,11 @@ class DashboardMessage extends Model
         }
     }
 
+    /**
+     * Fallback join-query wanneer de procedure niet beschikbaar is.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function fallback(): Collection
     {
         $rows = DB::table('messages')
@@ -46,6 +57,12 @@ class DashboardMessage extends Model
         return static::mapRows($rows);
     }
 
+    /**
+     * Vertaal ruwe query-resultaten naar read-model instanties.
+     *
+     * @param iterable<object> $rows
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function mapRows(iterable $rows): Collection
     {
         return collect($rows)->map(function ($row) {

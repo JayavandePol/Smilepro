@@ -16,9 +16,15 @@ class DashboardPatient extends Model
 {
     protected $table = 'patients';
 
+    /**
+     * Haal alle patientrecords via stored procedure (requirements 4.2 & 4.3).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     public static function records(): Collection
     {
         try {
+            // Requirement 4.3: stored procedure GetPatientsOverview powers this read.
             $rows = DB::select('CALL GetPatientsOverview()');
             return static::mapRows($rows);
         } catch (Throwable $exception) {
@@ -30,6 +36,11 @@ class DashboardPatient extends Model
         }
     }
 
+    /**
+     * Fallback query met ordering wanneer de procedure onbeschikbaar is.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function fallback(): Collection
     {
         $rows = DB::table('patients')
@@ -40,6 +51,12 @@ class DashboardPatient extends Model
         return static::mapRows($rows);
     }
 
+    /**
+     * Vertaal rauwe queryresultaten naar read-model instanties.
+     *
+     * @param iterable<object> $rows
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function mapRows(iterable $rows): Collection
     {
         return collect($rows)->map(function ($row) {

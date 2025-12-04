@@ -19,12 +19,15 @@ class DashboardOverviewController extends Controller
     {
         $user = Auth::user();
 
-        // Requirements 1.1 & 1.3 + 4.4: wrap the read in try/catch so we can surface success/error feedback.
+        // Requirements 1.1, 1.3 & 4.4: wrap reads in try/catch so we can surface clear success/error feedback.
         try {
             $metrics = DashboardOverview::metrics();
+            // Requirement 1.2: show success feedback to the end-user when the read succeeds.
             session()->flash('success', 'Dashboardgegevens succesvol geladen.');
+            // Requirement 4.7: log technical details for traceability.
             Log::info('Dashboard metrics loaded', ['user_id' => $user?->id]);
 
+            // Requirement 2.1: return the responsive Blade view that renders the metrics grid.
             return view('dashboard-overview', compact('user', 'metrics'));
         } catch (Throwable $exception) {
             Log::error('Failed to load dashboard metrics', [

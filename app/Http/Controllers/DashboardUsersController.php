@@ -28,13 +28,16 @@ class DashboardUsersController extends Controller
         try {
             $roleOptions = Role::orderBy('name')->pluck('name');
             $users = DashboardUser::withRoles($activeRole);
+            // Requirement 1.2: success toast so the user knows the read completed.
             session()->flash('success', 'Gebruikers succesvol geladen.');
+            // Requirement 4.7: structured logging of totals/filters.
             Log::info('Dashboard users loaded', [
                 'user_id' => $user?->id,
                 'total' => $users->count(),
                 'role_filter' => $activeRole,
             ]);
 
+            // Requirement 2.1: return Tailwind responsive table view.
             return view('dashboard.users.view', [
                 'user' => $user,
                 'users' => $users,
@@ -47,7 +50,7 @@ class DashboardUsersController extends Controller
                 'message' => $exception->getMessage(),
             ]);
 
-            // Requirement 4.4: show explicit unhappy scenario feedback.
+            // Requirement 1.4: explicit unhappy scenario feedback, logged per 4.4 & 4.7.
             session()->flash('error', 'Kon de gebruikerslijst niet ophalen. Probeer het later opnieuw.');
 
             return view('dashboard.users.view', [

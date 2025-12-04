@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Aggregates dashboard overview metrics through a stored procedure call.
+ * Aggregates dashboard overview metrics through a stored procedure call (requirements 4.2 & 4.3).
  */
 class DashboardOverview extends Model
 {
@@ -26,6 +26,7 @@ class DashboardOverview extends Model
     {
         // Requirement 4.3: primary read uses stored procedure GetDashboardMetrics.
         try {
+            // Requirement 4.3: stored procedure GetDashboardMetrics aggregates core stats.
             $result = DB::select('CALL GetDashboardMetrics()');
             $row = $result[0] ?? null;
 

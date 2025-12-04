@@ -10,15 +10,21 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Read model for appointments overview with fallback join query.
+ * Read model for appointments overview with fallback join query (requirements 4.2 & 4.3).
  */
 class DashboardAppointment extends Model
 {
     protected $table = 'appointments';
 
+    /**
+     * Haal alle afspraken op via stored procedure (requirements 4.2 & 4.3).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     public static function records(): Collection
     {
         try {
+            // Requirement 4.3: stored procedure GetAppointmentsOverview handles joins + filters.
             $rows = DB::select('CALL GetAppointmentsOverview()');
             return static::mapRows($rows);
         } catch (Throwable $exception) {
@@ -30,9 +36,15 @@ class DashboardAppointment extends Model
         }
     }
 
+    /**
+     * Bied teller-informatie voor afspraken (requirements afspraak-count requirement).
+     *
+     * @return array{total:int, scheduled:int, completed:int, cancelled:int}
+     */
     public static function counts(): array
     {
         try {
+            // Requirement 4.3: stored procedure GetAppointmentCounts gives aggregated totals.
             $result = DB::select('CALL GetAppointmentCounts()');
             $row = $result[0] ?? null;
             return [
@@ -56,6 +68,11 @@ class DashboardAppointment extends Model
         }
     }
 
+    /**
+     * Fallback join-query wanneer procedures falen.
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function fallback(): Collection
     {
         $rows = DB::table('appointments')
@@ -74,6 +91,12 @@ class DashboardAppointment extends Model
         return static::mapRows($rows);
     }
 
+    /**
+     * Vertaal queryresultaten naar read-model instanties voor de view-laag.
+     *
+     * @param iterable<object> $rows
+     * @return \Illuminate\Support\Collection<int, static>
+     */
     protected static function mapRows(iterable $rows): Collection
     {
         return collect($rows)->map(function ($row) {

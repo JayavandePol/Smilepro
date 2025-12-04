@@ -15,7 +15,6 @@ class UserRoleSeeder extends Seeder
     {
         $roles = [
             'patient',
-            'tandarts',
             'mondhygienist',
             'assistent',
             'praktijkmanagement',

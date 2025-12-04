@@ -18,8 +18,13 @@
 
     @php($links = [
         ['label' => 'Overzicht', 'route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'M4 6h16M4 12h16M4 18h16'],
-        ['label' => 'Gebruikers', 'route' => 'dashboard.users', 'match' => 'dashboard/users', 'icon' => 'M5 7l7-4 7 4M5 7v10l7 4 7-4V7'],
-        ['label' => 'Medewerkers', 'route' => 'dashboard.employees', 'match' => 'dashboard/employees', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m15-11a4 4 0 1 0-8 0 4 4 0 0 0 8 0']
+        ['label' => 'Gebruikers', 'route' => 'dashboard.users', 'match' => 'dashboard/users*', 'icon' => 'M5 7l7-4 7 4M5 7v10l7 4 7-4V7'],
+        ['label' => 'Medewerkers', 'route' => 'dashboard.employees', 'match' => 'dashboard/employees*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m15-11a4 4 0 1 0-8 0 4 4 0 0 0 8 0'],
+        ['label' => 'Beschikbaarheid', 'route' => 'dashboard.availability', 'match' => 'dashboard/availability*', 'icon' => 'M3 8h18M8 3v18m4-9h8m-8 4h5'],
+        ['label' => 'Patiënten', 'route' => 'dashboard.patients', 'match' => 'dashboard/patients*', 'icon' => 'M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 0c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Z'],
+        ['label' => 'Afspraken', 'route' => 'dashboard.appointments', 'match' => 'dashboard/appointments*', 'icon' => 'M3 5h18M8 3v4m8-4v4m-9 5h6m-6 4h3m-9 6h18V9H3Z'],
+        ['label' => 'Facturen', 'route' => 'dashboard.invoices', 'match' => 'dashboard/invoices*', 'icon' => 'M6 4h12v16H6z m0 4h12m-8 4h4'],
+        ['label' => 'Berichten', 'route' => 'dashboard.messages', 'match' => 'dashboard/messages*', 'icon' => 'M4 4h16v16H4z m0 4 8 5 8-5']
     ])
 
     <nav class="flex-1 px-3 py-6 space-y-2 overflow-y-auto">

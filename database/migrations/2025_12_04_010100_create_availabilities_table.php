@@ -14,7 +14,7 @@ return new class extends Migration
             $table->date('available_on');
             $table->string('slot');
             $table->enum('status', ['open', 'booked', 'blocked'])->default('open');
-            $table->string('notes')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

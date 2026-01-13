@@ -9,12 +9,44 @@
     ];
 @endphp
 <div class="space-y-8">
+    {{-- Success/Error Flash Messages --}}
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 shadow-sm dark:border-emerald-900/40 dark:bg-emerald-900/20">
+            <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">{{ session('success') }}</p>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 shadow-sm dark:border-red-900/40 dark:bg-red-900/20">
+            <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-medium text-red-800 dark:text-red-200">{{ session('error') }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
             <p class="text-xs uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Facturen</p>
             <h1 class="text-3xl font-semibold text-slate-900 dark:text-white">Financieel overzicht</h1>
             <p class="text-sm text-slate-600 dark:text-slate-300">Stored procedures leveren alle factuurregels inclusief patiëntinfo.</p>
         </div>
+        <a href="{{ route('dashboard.invoices.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Nieuwe factuur
+        </a>
+    </div>
+
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
         <form method="GET" action="{{ route('dashboard.invoices') }}" class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
             <label class="text-xs font-semibold uppercase tracking-widest text-slate-400">Status</label>
             <select name="status" class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-slate-700 dark:bg-slate-950 dark:text-white">

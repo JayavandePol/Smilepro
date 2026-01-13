@@ -3,18 +3,48 @@
 {{-- Requirement 2.1: Responsive grid/table powered by Tailwind just like the users overview. --}}
 @section('content')
 <div class="space-y-8">
+    {{-- Success/Error Flash Messages --}}
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 shadow-sm dark:border-emerald-900/40 dark:bg-emerald-900/20">
+            <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">{{ session('success') }}</p>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 shadow-sm dark:border-red-900/40 dark:bg-red-900/20">
+            <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-medium text-red-800 dark:text-red-200">{{ session('error') }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">team</p>
             <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">Medewerker overzicht</h1>
             <p class="text-gray-600 dark:text-gray-300">Bekijk alle medewerkers per rol en filter op specialisaties.</p>
         </div>
-        <div class="inline-flex flex-wrap gap-3">
-            <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-900/20 dark:text-emerald-200">
-                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                {{ $users->count() }} medewerkers
-            </span>
-        </div>
+        <a href="{{ route('dashboard.employees.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg hover:from-blue-700 hover:to-blue-600 transition-all">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Nieuwe medewerker
+        </a>
+    </div>
+
+    <div class="inline-flex flex-wrap gap-3">
+        <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-900/20 dark:text-emerald-200">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            {{ $users->count() }} medewerkers
+        </span>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">

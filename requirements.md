@@ -1,35 +1,44 @@
-# Requirements – Read Feature (Sprint 01 – Periode 02)
+Hier is het aangepaste requirements-document voor de **Create**-feature (Sprint 02).
 
-Dit document beschrijft alle functionele en technische vereisten voor het **Read**-gedeelte van de applicatie, gebaseerd op de sprintreview-criteria. De richtlijnen zijn geschreven zodat een AI of developer gestructureerd, compleet en correct code kan genereren conform de wensen van de opleiding.
+Ik heb de inhoud getransformeerd van "gegevens ophalen" (Read) naar "gegevens invoeren en opslaan" (Create), inclusief formuliervalidatie en `INSERT` stored procedures, maar met behoud van dezelfde structuur en beoordelingscriteria als je aangeleverde rubric.
+
+---
+
+# Requirements – Create Feature (Sprint 02 – Periode 02)
+
+Dit document beschrijft alle functionele en technische vereisten voor het **Create**-gedeelte van de applicatie. De richtlijnen zijn geschreven zodat een AI of developer gestructureerd, compleet en correct code kan genereren conform de wensen van de opleiding.
 
 ---
 
 ## 1. Functionele Requirements
 
-### ✔ 1.1 Happy Scenario – Read
+### ✔ 1.1 Happy Scenario – Create
 
-De applicatie moet succesvol data kunnen ophalen en tonen aan de eindgebruiker.
+De applicatie moet succesvol nieuwe data kunnen ontvangen van de gebruiker en opslaan in de database.
 
 **Voorbeeld:**
 
-* Gebruiker bezoekt `/products` → lijst van producten wordt getoond.
-* Data wordt opgehaald via een Controller (`ProductController@index`).
-* Blade-template toont de resultaten in een tabel of kaartweergave.
+* Gebruiker bezoekt `/products/create` → formulier wordt getoond.
+* Gebruiker vult formulier in en klikt op "Opslaan".
+* Data wordt verwerkt via een Controller (`ProductController@store`).
+* Data wordt opgeslagen in de database.
 
 ```php
 // Controller
-public function index()
+public function store(Request $request)
 {
-    $products = Product::all();
-    return view('products.index', compact('products'));
+    // Validatie en opslaan logica
+    Product::create($request->all());
+    return redirect()->route('products.index');
 }
+
 ```
 
 ---
 
 ### ✔ 1.2 End-user Feedback (Happy Scenario)
 
-Na een succesvolle read-actie ontvangt de gebruiker een visuele melding.
+Na een succesvolle create-actie ontvangt de gebruiker een visuele melding.
 
 **Voorbeeld:**
 
@@ -37,65 +46,71 @@ Na een succesvolle read-actie ontvangt de gebruiker een visuele melding.
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+
 ```
 
-Controller voegt melding toe:
+Controller voegt melding toe na opslaan:
 
 ```php
-return redirect()->back()->with('success', 'Producten succesvol geladen.');
+return redirect()->route('products.index')->with('success', 'Product succesvol aangemaakt.');
+
 ```
 
 ---
 
-### ✔ 1.3 Unhappy Scenario – Read
+### ✔ 1.3 Unhappy Scenario – Create
 
-Als het ophalen van data mislukt (bijv. databasefout of geen resultaten), moet een foutmelding worden getoond.
+Als het opslaan mislukt (bijv. validatiefout of databasefout), moet de gebruiker geïnformeerd worden en de invoer behouden blijven (indien mogelijk).
 
 **Voorbeeld:**
 
 ```php
-try {
-    $products = Product::all();
-    if ($products->isEmpty()) {
-        throw new Exception("Geen producten gevonden.");
-    }
-} catch (Exception $e) {
-    return redirect()->back()->with('error', $e->getMessage());
-}
+$validated = $request->validate([
+    'name' => 'required|max:255',
+    'price' => 'required|numeric',
+]);
+// Bij falen wordt automatisch terugverwezen met $errors
+
 ```
 
-**In Blade:**
+**In Blade (Validatie meldingen):**
 
 ```blade
-@if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
-@endif
+<input type="text" name="name" class="@error('name') border-red-500 @enderror">
+@error('name')
+    <div class="text-red-500">{{ $message }}</div>
+@enderror
+
 ```
 
 ---
 
 ### ✔ 1.4 End-user Feedback (Unhappy Scenario)
 
-Foutmeldingen moeten duidelijk leesbaar zijn en de gebruiker informeren over het probleem.
+Foutmeldingen (zoals "Veld is verplicht") moeten duidelijk leesbaar zijn bij de betreffende invoervelden.
 
 ---
 
 ## 2. UI/UX Requirements
 
-### ✔ 2.1 Responsive Design
+### ✔ 2.1 Responsive Design (Formulier)
 
-De webapplicatie moet volledig responsive zijn met behulp van **TailwindCSS**.
+Het invulformulier moet volledig responsive zijn met behulp van **TailwindCSS**.
 
 **Voorbeeld:**
 
 ```blade
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    @foreach($products as $product)
-        <div class="p-4 bg-white rounded shadow">
-            <h2 class="text-lg font-bold">{{ $product->name }}</h2>
-        </div>
-    @endforeach
-</div>
+<form action="{{ route('products.store') }}" method="POST" class="max-w-lg mx-auto p-4 bg-white shadow rounded">
+    @csrf
+    <div class="mb-4">
+        <label class="block text-gray-700 font-bold mb-2">Product Naam</label>
+        <input type="text" name="name" class="w-full px-3 py-2 border rounded">
+    </div>
+    <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+        Opslaan
+    </button>
+</form>
+
 ```
 
 ---
@@ -104,30 +119,31 @@ De webapplicatie moet volledig responsive zijn met behulp van **TailwindCSS**.
 
 ### ✔ 3.1 Uitleg MVC-architectuur verplicht
 
-AI moet de structuur van het patroon volgen:
+AI moet de structuur van het patroon volgen voor Create:
 
-* **Model** → database interacties
-* **View (Blade)** → presentatie
-* **Controller** → logica tussen View en Model
+* **View (Blade)** → `create.blade.php` bevat het HTML-formulier.
+* **Controller** → `store()` method handelt de `POST` request af en roept het Model aan.
+* **Model** → `Product` model regelt de `INSERT` in de database (mass assignment).
 
 **Voorbeeldmap:**
 
 ```
-app/Models/Product.php
-app/Http/Controllers/ProductController.php
-resources/views/products/index.blade.php
+resources/views/products/create.blade.php
+app/Http/Controllers/ProductController.php (method: create & store)
+app/Models/Product.php ($fillable)
+
 ```
 
 ---
 
-### ✔ 3.2 UML Klassediagram (Read)
+### ✔ 3.2 UML Klassediagram (Create)
 
-Er moet een UML-schema aanwezig zijn. AI moet de structuur kunnen afleiden.
+Er moet een UML-schema aanwezig zijn. De flow van invoer naar database moet duidelijk zijn.
 
 Voorbeeld beschrijving:
 
-* `Product` heeft velden: id, name, price, stock
-* `ProductController` gebruikt `Product` model om data op te halen
+* `ProductController` heeft method `store(Request $request)`
+* `Product` Model heeft properties die overeenkomen met de formuliervelden.
 
 ---
 
@@ -135,62 +151,84 @@ Voorbeeld beschrijving:
 
 ### ✔ 4.1 Commentaar in de Code
 
-Elke functie in Controller en Model moet kort en duidelijk gedocumenteerd zijn.
+Elke functie in Controller (create/store) moet kort en duidelijk gedocumenteerd zijn.
 
 ```php
 /**
- * Haalt alle producten op uit de database.
+ * Toont het formulier om een nieuw product aan te maken.
  */
-public function index() { ... }
+public function create() { ... }
+
+/**
+ * Valideert de invoer en slaat het nieuwe product op in de database.
+ */
+public function store(Request $request) { ... }
+
 ```
 
 ---
 
-### ✔ 4.2 Gebruik van Joins
+### ✔ 4.2 Gebruik van Relaties/Joins (in Create Context)
 
-Read-functionaliteit moet minimaal één JOIN-query bevatten.
+Bij het aanmaken van een item moet vaak een relatie gekozen worden (bijv. Categorie kiezen via een dropdown). Hiervoor is een **join** of relationele query nodig om de opties op te halen.
 
 **Eloquent voorbeeld:**
 
 ```php
-$products = Product::select('products.*', 'categories.name AS category')
-    ->join('categories', 'categories.id', '=', 'products.category_id')
-    ->get();
+// In de create method
+$categories = Category::all(); // Haalt data op voor de <select> opties
+return view('products.create', compact('categories'));
+
+```
+
+**Blade:**
+
+```blade
+<select name="category_id">
+    @foreach($categories as $category)
+        <option value="{{ $category->id }}">{{ $category->name }}</option>
+    @endforeach
+</select>
+
 ```
 
 ---
 
 ### ✔ 4.3 Gebruik van Stored Procedures
 
-De applicatie moet gegevens kunnen ophalen via een Stored Procedure.
+De applicatie moet gegevens kunnen opslaan via een Stored Procedure (INSERT).
 
 **Voorbeeld (MySQL):**
 
 ```sql
-CREATE PROCEDURE GetAllProducts()
+CREATE PROCEDURE InsertProduct(IN p_name VARCHAR(255), IN p_price DECIMAL(10,2))
 BEGIN
-    SELECT * FROM products;
+    INSERT INTO products (name, price) VALUES (p_name, p_price);
 END;
+
 ```
 
 **Laravel:**
 
 ```php
-$products = DB::select('CALL GetAllProducts()');
+DB::statement('CALL InsertProduct(?, ?)', [$request->name, $request->price]);
+
 ```
 
 ---
 
 ### ✔ 4.4 Try/Catch verplicht
 
-Foutafhandeling moet altijd worden toegepast.
+Foutafhandeling moet toegepast worden bij het opslaan.
 
 ```php
 try {
-    $data = DB::table('products')->get();
+    Product::create($validatedData);
 } catch (QueryException $e) {
-    Log::error($e->getMessage());
+    Log::error("Fout bij aanmaken product: " . $e->getMessage());
+    return redirect()->back()->with('error', 'Database fout opgetreden.');
 }
+
 ```
 
 ---
@@ -199,10 +237,9 @@ try {
 
 AI moet code uitvoeren volgens:
 
-* duidelijke inspringing
-* juiste spacing
-* snake_case voor databasevelden
-* camelCase voor functions & variables
+* Validatie logica netjes gegroepeerd.
+* Duidelijke inspringing in arrays en HTML-attributen.
+* Correct gebruik van `Request` object injection.
 
 ---
 
@@ -210,33 +247,35 @@ AI moet code uitvoeren volgens:
 
 Functies en variabelen moeten betekenisvol zijn.
 
-**Goed:** `$availableProducts`, `loadProductData()`
+**Goed:** `$newProduct`, `storeProduct()`, `$validatedAttributes`
 
-**Slecht:** `$x`, `get1()`
+**Slecht:** `$p`, `saveIt()`, `$data`
 
 ---
 
 ### ✔ 4.7 Technische Log
 
-Acties en fouten moeten gelogd worden.
+Acties (succesvol aangemaakt) en fouten moeten gelogd worden.
 
 ```php
-Log::info('Producten succesvol opgehaald.');
-Log::error('Database fout bij ophalen producten: ' . $e->getMessage());
+Log::info('Nieuw product aangemaakt: ' . $product->id);
+Log::error('Create actie mislukt: ' . $e->getMessage());
+
 ```
 
 ---
 
 ### ✔ 4.8 Minimaal 10 Commits
 
-Repository moet minimaal **10 commits** bevatten met duidelijke en beschrijvende messages.
+Repository moet minimaal **10 commits** bevatten met duidelijke en beschrijvende messages over de create-functionaliteit.
 
 **Goed commitvoorbeeld:**
 
 ```
-feat: implement read functionality with joins and stored procedures
-fix: add error handling for empty dataset
-refactor: improve controller naming conventions
+feat: implement create form layout with tailwind
+feat: add store method with validation logic
+fix: resolve issue with stored procedure parameters
+
 ```
 
 ---
@@ -249,4 +288,4 @@ Totale punten: **27 / 27**
 
 ## Doel van dit Document
 
-Dit `requirements.md` bestand kan direct worden gebruikt door AI-modellen of developers om correcte code te genereren die voldoet aan de beoordelingsrubriek.
+Dit `requirements.md` bestand is geüpdatet voor **Sprint 02 (Create)** en kan direct worden gebruikt door AI-modellen of developers om de code te genereren die voldoet aan de beoordelingsrubriek voor het aanmaken van gegevens.

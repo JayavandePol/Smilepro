@@ -8,12 +8,34 @@
     ];
 @endphp
 <div class="space-y-8">
+    {{-- Requirement 1.2: Success feedback after creating patient --}}
+    @if(session('success'))
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-800 shadow dark:border-emerald-500/30 dark:bg-emerald-900/30 dark:text-emerald-100">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- Requirement 1.4: Error feedback --}}
+    @if(session('error'))
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-6 py-4 text-sm text-red-800 shadow dark:border-red-500/30 dark:bg-red-900/30 dark:text-red-100">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="text-xs uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">Patiënten</p>
             <h1 class="text-3xl font-semibold text-slate-900 dark:text-white">Cliëntenbestand</h1>
             <p class="text-sm text-slate-600 dark:text-slate-300">Lees alle patiëntgegevens inclusief contact en laatste bezoek.</p>
         </div>
+        <a href="{{ route('dashboard.patients.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nieuwe patiënt
+        </a>
+    </div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <form method="GET" action="{{ route('dashboard.patients') }}" class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow dark:border-slate-800 dark:bg-slate-900">
             <label class="text-xs font-semibold uppercase tracking-widest text-slate-400">Segment</label>
             <div class="flex flex-wrap gap-2">

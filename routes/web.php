@@ -37,17 +37,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/employees', [DashboardEmployeesController::class, 'index'])
         ->name('dashboard.employees');
 
+    // Create new employee (Sprint 02 – Create feature)
+    Route::get('/dashboard/employees/create', [DashboardEmployeesController::class, 'create'])
+        ->name('dashboard.employees.create');
+
+    Route::post('/dashboard/employees', [DashboardEmployeesController::class, 'store'])
+        ->name('dashboard.employees.store');
+
     Route::get('/dashboard/availability', [DashboardAvailabilityController::class, 'index'])
         ->name('dashboard.availability');
 
+    // Create new availability (Sprint 02 – Create feature)
+    Route::get('/dashboard/availability/create', [DashboardAvailabilityController::class, 'create'])
+        ->name('dashboard.availability.create');
+
+    Route::post('/dashboard/availability', [DashboardAvailabilityController::class, 'store'])
+        ->name('dashboard.availability.store');
+
     Route::get('/dashboard/patients', [DashboardPatientsController::class, 'index'])
         ->name('dashboard.patients');
+
+    // Create new patient (Sprint 02 – Create feature)
+    Route::get('/dashboard/patients/create', [DashboardPatientsController::class, 'create'])
+        ->name('dashboard.patients.create');
+
+    Route::post('/dashboard/patients', [DashboardPatientsController::class, 'store'])
+        ->name('dashboard.patients.store');
 
     Route::get('/dashboard/appointments', [DashboardAppointmentsController::class, 'index'])
         ->name('dashboard.appointments');
 
     Route::get('/dashboard/invoices', [DashboardInvoicesController::class, 'index'])
         ->name('dashboard.invoices');
+
+    // Create new invoice (Sprint 02 – Create feature)
+    Route::get('/dashboard/invoices/create', [DashboardInvoicesController::class, 'create'])
+        ->name('dashboard.invoices.create');
+
+    Route::post('/dashboard/invoices', [DashboardInvoicesController::class, 'store'])
+        ->name('dashboard.invoices.store');
 
     Route::get('/dashboard/messages', [DashboardMessagesController::class, 'index'])
         ->name('dashboard.messages');
